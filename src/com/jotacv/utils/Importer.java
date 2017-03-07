@@ -26,7 +26,7 @@ public class Importer {
 		String value = def;
 		if (cell.getCellType() == Cell.CELL_TYPE_STRING) {
 			if(quoted)
-				value = "'"+cell.getStringCellValue().replace("\n", "\\n")+"'";
+				value = "'"+cell.getStringCellValue().replace("\n", "\\n").replace("'", "\'")+"'";
 			else
 				value = cell.getStringCellValue();
 		} else {
@@ -40,20 +40,19 @@ public class Importer {
 		return value;
 	}
 	
-	public Importer (String tableName, String filename) {
+	public Importer (String filename) {
 		try{
-			this.tableName = tableName;
+			
 			this.sheetData = new ArrayList<List<Cell>>();
 			InputStream is = new FileInputStream(filename);
 			this.workbook = new XSSFWorkbook(is);
 			XSSFSheet sheet = this.workbook.getSheetAt(0);
+			this.tableName = sheet.getSheetName();
 			
-			System.out.print("Got the file");
+			System.out.print("Got the file... ");
 			this.maxwidth = sheet.getRow(0).getLastCellNum();
 			Iterator<Row> rows = sheet.rowIterator();
-			int k = 0;
 			while (rows.hasNext()) {
-				if(k++%10==0)System.out.print(".");
 				XSSFRow row = (XSSFRow) rows.next();
 				List<Cell> data = new ArrayList<Cell>();
 				for (int i = 0; i < maxwidth; i++) {
@@ -94,7 +93,7 @@ public class Importer {
 			Iterator<List<Cell>> it = this.sheetData.iterator();
 			it.next();	//Skip first;
 			while(it.hasNext()){
-				if(k++%10==0)System.out.print(".");
+				if(k++%50==0)System.out.print(".");
 				List<Cell> row = it.next();
 				StringBuilder sb = new StringBuilder();
 				sb.append("INSERT INTO ");
@@ -123,7 +122,7 @@ public class Importer {
 	}
 
 	public static void main(String[] args) {
-		Importer importer = new Importer(args[0],args[1]);
+		Importer importer = new Importer(args[0]);
 		importer.generate();
 	}
 
