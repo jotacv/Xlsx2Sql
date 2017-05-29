@@ -46,12 +46,12 @@ public class Converter {
 		return value;
 	}
 	
-	public Converter (String filename, int sheetNum) {
+	public Converter (InputStream is, int sheetNum) {
 		try{
 
 			this.sheetNum = sheetNum;
 			this.sheetData = new ArrayList<List<Cell>>();
-			InputStream is = new FileInputStream(filename);
+
 			this.workbook = new XSSFWorkbook(is);
 			XSSFSheet sheet = this.workbook.getSheetAt(sheetNum);
 			this.tableName = sheet.getSheetName();
