@@ -2,39 +2,42 @@ package com.jotacv.utils;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
+
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class XlsToSql {
 
-	public static void main(String[] args) {
-		if(args.length==1){
+	public static void main(String[] args) throws IOException {
+		if (args.length == 1) {
 			InputStream is = null;
-			
-			try{
-				int count = 0; 
+			XSSFWorkbook wb = null;
+			try {
+				int count = 0;
 				is = new FileInputStream(args[0]);
-				for(;;){
-					Converter converter = new Converter(is, count++);
+				wb = new XSSFWorkbook(is);
+				for (;;) {
+					Converter converter = new Converter(wb, count++);
 					converter.run();
 				}
-			}catch(FileNotFoundException fnfe){
-				System.out.println("Couldn't find the sheet or bad stuff happened.");
-				fnfe.printStackTrace();
-			
-			}catch(Exception e){
+			} catch (IllegalArgumentException iae) {
 				System.out.println("All done.");
-				
-			}finally{
-				try{
-					if(is!=null)
-						is.close();
-				}catch(Exception e){
-					e.printStackTrace();
-				}
+
+			} catch (FileNotFoundException fnfe) {
+				System.out.println("Couldn't find the sheet ");
+				fnfe.printStackTrace();
+
+			} catch (IOException e) {
+				e.printStackTrace();
+
+			} finally {
+				wb.close();
+				is.close();
 			}
-		}else{
+		} else {
 			System.out.println("Usage java -jar Xls2Sql.jar [datasheet.xlsx]");
 		}
 	}
 
-} 
+}
